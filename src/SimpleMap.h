@@ -66,11 +66,39 @@ Node<T, U>* SimpleMap<T, U>::getNode(T key) {
     if (listSize > 0) {
         if ((compare(key, listBegin->key) < 0) || (compare(key, listEnd->key) > 0)) return NULL;
 
+        isCached     = true;
+        lastIndexGot = 0;
+        lastNodeGot  = listBegin;
+
         Node<T, U>* h = listBegin;
 
-        while (h) {
-            if (compare(h->key, key) == 0) return h;
-            else h = h->next;
+        int lowerEnd = 0;
+        int upperEnd = listSize - 1;
+        int res;
+        int mid = (lowerEnd + upperEnd) / 2;
+
+        int hIndex = 0;
+
+        while (lowerEnd <= upperEnd) {
+            h      = lastNodeGot;
+            hIndex = lastIndexGot;
+
+            res = compare(key, getNodeIndex(mid)->key);
+
+            if (res == 0) {
+                return getNodeIndex(mid);
+            } else if (res < 0) {
+                // when going left, set cached node back to previous cached node
+                lastNodeGot  = h;
+                lastIndexGot = hIndex;
+                isCached     = true;
+
+                upperEnd = mid - 1;
+                mid      = (lowerEnd + upperEnd) / 2;
+            } else if (res > 0) {
+                lowerEnd = mid + 1;
+                mid      = (lowerEnd + upperEnd) / 2;
+            }
         }
     }
     return NULL;
@@ -100,6 +128,7 @@ Node<T, U>* SimpleMap<T, U>::getNodeIndex(int index) {
         lastIndexGot = c;
         lastNodeGot  = hNode;
     }
+
     return hNode;
 }
 
