@@ -9,6 +9,20 @@
 
 SimpleMap<String, String>* myMap;
 
+String toJSON() {
+    String s;
+
+    s += '{';
+
+    for (int i = 0; i < myMap->size(); i++) {
+        s += "\"" + myMap->getKey(i) + "\":\"" + myMap->getData(i) + "\"";
+
+        if (i < myMap->size() - 1) s += ',';
+    }
+    s += "}";
+    return s;
+}
+
 void setup() {
     Serial.begin(115200);
     delay(200);
@@ -25,7 +39,7 @@ void setup() {
     myMap->put("two", "2");
     myMap->put("three", "3");
 
-    Serial.println(myMap->toJson());
+    Serial.println(toJSON());
 
     Serial.println("one: " + myMap->get("one"));
     Serial.println("two: " + myMap->get("two"));
@@ -35,7 +49,7 @@ void setup() {
     myMap->put("three", "33");
     Serial.println();
 
-    Serial.println(myMap->toJson());
+    Serial.println(toJSON());
 
     Serial.println("one: " + myMap->get("one"));
     Serial.println("two: " + myMap->get("two"));
@@ -50,9 +64,9 @@ void setup() {
     Serial.println("has three: " + (String)myMap->has("three"));
     Serial.println("has vier: " + (String)myMap->has("vier"));
 
-    Serial.println(myMap->toJson());
+    Serial.println(toJSON());
     myMap->remove("two");
-    Serial.println(myMap->toJson());
+    Serial.println(toJSON());
 }
 
 void loop() {

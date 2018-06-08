@@ -24,8 +24,10 @@ class SimpleMap {
         virtual void remove(T key);
         virtual void put(T key, U obj);
         virtual U get(T key);
+        virtual T getKey(int i);
+        virtual U getData(int i);
+        virtual int getIndex(T key);
         virtual bool has(T key);
-        virtual String toJson();
 
     protected:
         int listSize;
@@ -34,7 +36,7 @@ class SimpleMap {
 
         // Helps get() method by saving last position
         Node<T, U>* lastNodeGot = NULL;
-        int lastIndexGot        = 0;
+        int lastIndexGot        = -1;
         bool isCached           = false;
 
         virtual Node<T, U>* getNode(T key);
@@ -47,6 +49,9 @@ SimpleMap<T, U>::SimpleMap(std::function<int(T a, T b)>compare) {
     listBegin                = NULL;
     listEnd                  = NULL;
     listSize                 = 0;
+    isCached                 = false;
+    lastIndexGot             = -1;
+    lastNodeGot              = NULL;
 }
 
 // Clear Nodes and free Memory
@@ -66,10 +71,6 @@ Node<T, U>* SimpleMap<T, U>::getNode(T key) {
     if (listSize > 0) {
         if ((compare(key, listBegin->key) < 0) || (compare(key, listEnd->key) > 0)) return NULL;
 
-        isCached     = true;
-        lastIndexGot = 0;
-        lastNodeGot  = listBegin;
-
         Node<T, U>* h = listBegin;
 
         int lowerEnd = 0;
@@ -86,7 +87,7 @@ Node<T, U>* SimpleMap<T, U>::getNode(T key) {
             res = compare(key, getNodeIndex(mid)->key);
 
             if (res == 0) {
-                return getNodeIndex(mid);
+                return lastNodeGot;
             } else if (res < 0) {
                 // when going left, set cached node back to previous cached node
                 lastNodeGot  = h;
@@ -146,6 +147,10 @@ void SimpleMap<T, U>::clear() {
     listBegin = NULL;
     listEnd   = NULL;
     listSize  = 0;
+
+    isCached     = false;
+    lastIndexGot = -1;
+    lastNodeGot  = NULL;
 }
 
 template<typename T, typename U>
@@ -165,6 +170,7 @@ void SimpleMap<T, U>::put(T key, U obj) {
     Node<T, U>* h = listBegin;
     Node<T, U>* p = NULL;
     bool found    = false;
+    int  c        = 0;
 
     if (listSize > 0) {
         while (h != NULL && !found) {
@@ -173,6 +179,7 @@ void SimpleMap<T, U>::put(T key, U obj) {
             } else {
                 p = h;
                 h = h->next;
+                c++;
             }
         }
     }
@@ -186,6 +193,8 @@ void SimpleMap<T, U>::put(T key, U obj) {
         if (p) p->next = newNode;
         newNode->next = h->next;
         delete h;
+
+        lastIndexGot = c;
     }
 
     // create new node
@@ -194,20 +203,27 @@ void SimpleMap<T, U>::put(T key, U obj) {
             // add at start (first node)
             listBegin = newNode;
             listEnd   = newNode;
+
+            lastIndexGot = 0;
         } else {
             if (key >= listEnd->key) {
                 // add at end
                 listEnd->next = newNode;
                 listEnd       = newNode;
+
+                lastIndexGot = listSize;
             } else if (key <= listBegin->key) {
                 // add at start
                 newNode->next = listBegin;
                 listBegin     = newNode;
+
+                lastIndexGot = 0;
             } else {
                 // insertion sort
                 h     = listBegin;
                 p     = NULL;
                 found = false;
+                c     = 0;
 
                 while (h != NULL && !found) {
                     if (compare(h->key, key) > 0) {
@@ -215,16 +231,22 @@ void SimpleMap<T, U>::put(T key, U obj) {
                     } else {
                         p = h;
                         h = h->next;
+                        c++;
                     }
                 }
                 newNode->next = h;
 
                 if (p) p->next = newNode;
+
+                lastIndexGot = c;
             }
         }
 
         listSize++;
     }
+
+    isCached    = true;
+    lastNodeGot = newNode;
 }
 
 template<typename T, typename U>
@@ -262,21 +284,20 @@ bool SimpleMap<T, U>::has(T key) {
 }
 
 template<typename T, typename U>
-String SimpleMap<T, U>::toJson() {
-    String json = "{";
+T SimpleMap<T, U>::getKey(int i) {
+    Node<T, U>* h = getNodeIndex(i);
+    return h ? h->key : T();
+}
 
-    /*
-        Node<T,U>* h = listBegin;
+template<typename T, typename U>
+U SimpleMap<T, U>::getData(int i) {
+    Node<T, U>* h = getNodeIndex(i);
+    return h ? h->data : U();
+}
 
-        while (h != NULL) {
-            json += "\"" + h->key + "\":\"" + h->data + "\"";
-
-            if (h->next) json += ",";
-            h = h->next;
-        }
-     */
-    json += "}";
-    return json;
+template<typename T, typename U>
+int SimpleMap<T, U>::getIndex(T key) {
+    return getNode(key) ? lastIndexGot : -1;
 }
 
 #endif // ifndef SimpleMap_h
