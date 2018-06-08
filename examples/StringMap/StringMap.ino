@@ -46,6 +46,11 @@ void setup() {
     Serial.println("three: " + myMap->get("three"));
     Serial.println("four: " + myMap->get("four"));
 
+    Serial.println("index of one: " + (String)myMap->getIndex("one"));
+    Serial.println("index of two: " + (String)myMap->getIndex("two"));
+    Serial.println("index of three: " + (String)myMap->getIndex("three"));
+    Serial.println("index of four: " + (String)myMap->getIndex("four"));
+
     myMap->put("three", "33");
     Serial.println();
 
