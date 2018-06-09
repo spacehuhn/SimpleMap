@@ -29,7 +29,7 @@ void setup() {
     Serial.println("STARTED!");
 
     // create a map
-    myMap = new SimpleMap<String, String>([](String a, String b) -> int {
+    myMap = new SimpleMap<String, String>([](String& a, String& b) -> int {
         if (a == b) return 0;
 
         if (a > b) return 1;

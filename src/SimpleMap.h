@@ -14,9 +14,9 @@ struct SimpleMapNode {
 template<typename T, typename U>
 class SimpleMap {
     public:
-        int (*compare)(T a, T b);
+        int (*compare)(T & a, T & b);
 
-        SimpleMap(int (*compare)(T a, T b));
+        SimpleMap(int (*compare)(T & a, T & b));
         ~SimpleMap();
 
         virtual int size();
@@ -45,7 +45,7 @@ class SimpleMap {
 };
 
 template<typename T, typename U>
-SimpleMap<T, U>::SimpleMap(int (*compare)(T a, T b)) {
+SimpleMap<T, U>::SimpleMap(int (*compare)(T & a, T & b)) {
     SimpleMap<T, U>::compare = compare;
     listBegin                = NULL;
     listEnd                  = NULL;
