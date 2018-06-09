@@ -3,7 +3,7 @@ Associative arrays with Arduino!
 
 Nothing big, just my own implementation of an associative array - also known as Map or HashMap (when you're coming from Java) for all kind of Arduino projects.  
 
-I wrote it to use in some of my projects and to learn more about C++.  
+I wrote it to use in my Arduino projects and to learn more about datastructures and C++.  
 
 ## Installation
 
@@ -22,122 +22,71 @@ file and paste it in your Arduino sketch folder.
 #include <SimpleMap.h>  
 ```
 
-### Creating a SimpleList
+### Creating a map
 ```c++
-// A list of integer
-SimpleMap<String> *myMap = new SimpleMap<String>();
+// A map of strings
+// Please not that it's necessary to provide a compare function, because it's needed to keep the map sorted!  
+SimpleMap<String, String> *myMap = new SimpleMap<String, String>([](String a, String b) -> int {
+        if (a == b) return 0;      // a and b are equal
 
-// A list of 'MyClass'
-SimpleMap<MyClass> *myMap = new SimpleMap<MyClass>();
+        else if (a > b) return 1;  // a is bigger than b
+
+        else return -1;            // a is smaller than b
+    });
 ```
 
-### Getting the list size
+### Getting the map size
 ```c++
 int theSize = myMap->size();
 ```
 
 ### Adding elements
 ```c++
-// add(obj) will add the object at the end of the list
-myList->add(myObject);
-
-// add(index, obj) method will insert the object at the specified index
-myList->add(0, myObject); // Add at the beginning
-myList->add(3, myObject); // Add at index 3
+myMap->put("one", "1");
+myMap->put("two", "2");
+myMap->put("three", "3");
 ```
 
 ### Getting elements
 ```c++
-// Get the first element
-myObject = myList->get(0);
+// get value of element with key "one"
+String one = myMap->get("one");
 
-// Get the third element
-myObject = myList->get(2);
+// get index of element with key "one"
+int i = myMap->getIndex("one");
 
-// Get the last element
-myObject = myList->get(myList->size() - 1);
+// get key of element at index i
+String oneKey = myMap->getKey(i);
+
+// get value of element at index i
+String oneValue = myMap->getData(i);
+
+// check if element is in list
+bool hasOne = myMap->has("one");
 ```
 
 ### Replacing elements
 ```c++
-// Replace the first element
-myList->replace(0, myObject);
-
-// Replace the third element
-myList->replace(2, myObject);
-
-// Replace the last element
-myList->replace(myList->size() - 1, myObject);
+// to replace or change a value is the same operation as to add value
+myMap->put("one", "1"); // adds element with key "one" and value "1"
+myMap->put("one", "11"); // sets the value of element with key "one" to "11"
 ```
 
 ### Removing elements
 ```c++
-// Remove the first object
-myList->remove(0);
+// remove element with key "one"
+myMap->remove("one");
 
-// pop() will remove and return the last element
-myDeletedObject = myList->pop();
+// remove element at index 0
+myMap->remove(0);
 
-// shift() will remove and return the first element
-myDeletedObject = myList->shift();
-
-// clear() will erase the entire list, leaving it with 0 elements
+// clear() will erase the entire map, leaving it with 0 elements
 myList->clear();
 
 // Please note that clear() wont free memory from pointers, you have to manually delete/free those!
 // Example:
-while(list->size() > 0){
-	delete myList->get(0).somePointer;
-	list->remove(0);
+while(myMap->size() > 0){
+	delete myMap->get(0).somePointer;
+	myMap->remove(0);
 }
-```
-
-### Sorting list
-```c++
-myList->sort([](int &a, int &b) -> bool { 
-    return a > b; 
-});
-```
-
-### Searching for elements
-```c++
-// seach() returns the index of the element, not the element itself!
-int indexOfSeven = list->search([](int &a) -> bool{ 
-	return a == 7; 
-});
-
-int indexOftheFirstSelected = list->search([](MyClass &a) -> bool{ 
-	return a.selected; 
-});
-MyClass firstSelected = list->get(indexOftheFirstSelected);
-
-// searchNext is like search() but will start on the last used index instead of index 0
-int indexOftheNextSelected = list->searchNext([](MyClass &a) -> bool{ 
-	return a.selected; 
-});
-
-// When the list is sorted, you can also do a more efficient binary search
-// here find the element 
-int indexOfIntOne = list->binSearch([](int &a) -> int{ 
-	if(a == 1) return 0; 
-    if(a < 1) return 1; 
-    if(a > 1) return -1;   
-})); 
-```
-
-### Counting elements
-```c++
-int numberOfZeros = myList->count([](int &a)->bool{
-    return a == 0;  
-});
-
-int selectedNum = myList->count([](MyClass &a)->bool{
-    return a.selected;  
-});
-```
-
-### Swapping elements
-```c++
-// swap(index-X, index-Y)
-list->swap(0, list->size()-1);
 ```
