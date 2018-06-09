@@ -14,14 +14,15 @@ struct Node {
 template<typename T, typename U>
 class SimpleMap {
     public:
-        std::function<int(T a, T b)>compare = NULL;
+        int (*compare)(T a, T b);
 
-        SimpleMap(std::function<int(T a, T b)>compare);
+        SimpleMap(int (*compare)(T a, T b));
         ~SimpleMap();
 
         virtual int size();
         virtual void clear();
         virtual void remove(T key);
+        virtual void remove(int i);
         virtual void put(T key, U obj);
         virtual U get(T key);
         virtual T getKey(int i);
@@ -44,7 +45,7 @@ class SimpleMap {
 };
 
 template<typename T, typename U>
-SimpleMap<T, U>::SimpleMap(std::function<int(T a, T b)>compare) {
+SimpleMap<T, U>::SimpleMap(int (*compare)(T a, T b)) {
     SimpleMap<T, U>::compare = compare;
     listBegin                = NULL;
     listEnd                  = NULL;
@@ -272,6 +273,26 @@ void SimpleMap<T, U>::remove(T key) {
             else listBegin = h->next;
 
             if (listEnd == h) listEnd = p;
+            listSize--;
+            delete h;
+        }
+    }
+}
+
+template<typename T, typename U>
+void SimpleMap<T, U>::remove(int i) {
+    if (listSize > 0) {
+        Node<T, U>* h = getNodeIndex(i);
+
+        if (h != NULL) {
+            Node<T, U>* p = getNodeIndex(i);
+
+            if (p != NULL) p->next = h->next;
+
+            if (h == listBegin) listBegin = h->next;
+
+            if (h == listEnd) listEnd = p;
+
             listSize--;
             delete h;
         }
