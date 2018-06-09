@@ -5,10 +5,10 @@
 #include <functional>
 
 template<class T, class U>
-struct Node {
-    T           key;
-    U           data;
-    Node<T, U>* next;
+struct SimpleMapNode {
+    T                    key;
+    U                    data;
+    SimpleMapNode<T, U>* next;
 };
 
 template<typename T, typename U>
@@ -32,16 +32,16 @@ class SimpleMap {
 
     protected:
         int listSize;
-        Node<T, U>* listBegin;
-        Node<T, U>* listEnd;
+        SimpleMapNode<T, U>* listBegin;
+        SimpleMapNode<T, U>* listEnd;
 
         // Helps get() method by saving last position
-        Node<T, U>* lastNodeGot = NULL;
-        int lastIndexGot        = -1;
-        bool isCached           = false;
+        SimpleMapNode<T, U>* lastNodeGot = NULL;
+        int lastIndexGot                 = -1;
+        bool isCached                    = false;
 
-        virtual Node<T, U>* getNode(T key);
-        virtual Node<T, U>* getNodeIndex(int index);
+        virtual SimpleMapNode<T, U>* getNode(T key);
+        virtual SimpleMapNode<T, U>* getNodeIndex(int index);
 };
 
 template<typename T, typename U>
@@ -63,16 +63,16 @@ SimpleMap<T, U>::~SimpleMap() {
 
 template<typename T, typename U>
 U SimpleMap<T, U>::get(T key) {
-    Node<T, U>* h = getNode(key);
+    SimpleMapNode<T, U>* h = getNode(key);
     return h ? h->data : U();
 }
 
 template<typename T, typename U>
-Node<T, U>* SimpleMap<T, U>::getNode(T key) {
+SimpleMapNode<T, U>* SimpleMap<T, U>::getNode(T key) {
     if (listSize > 0) {
         if ((compare(key, listBegin->key) < 0) || (compare(key, listEnd->key) > 0)) return NULL;
 
-        Node<T, U>* h = listBegin;
+        SimpleMapNode<T, U>* h = listBegin;
 
         int lowerEnd = 0;
         int upperEnd = listSize - 1;
@@ -107,13 +107,13 @@ Node<T, U>* SimpleMap<T, U>::getNode(T key) {
 }
 
 template<typename T, typename U>
-Node<T, U>* SimpleMap<T, U>::getNodeIndex(int index) {
+SimpleMapNode<T, U>* SimpleMap<T, U>::getNodeIndex(int index) {
     if ((index < 0) || (index >= listSize)) {
         return NULL;
     }
 
-    Node<T, U>* hNode = listBegin;
-    int c             = 0;
+    SimpleMapNode<T, U>* hNode = listBegin;
+    int c                      = 0;
 
     if (isCached && (index >= lastIndexGot)) {
         c     = lastIndexGot;
@@ -136,8 +136,8 @@ Node<T, U>* SimpleMap<T, U>::getNodeIndex(int index) {
 
 template<typename T, typename U>
 void SimpleMap<T, U>::clear() {
-    Node<T, U>* h = listBegin;
-    Node<T, U>* toDelete;
+    SimpleMapNode<T, U>* h = listBegin;
+    SimpleMapNode<T, U>* toDelete;
 
     while (h != NULL) {
         toDelete = h;
@@ -162,16 +162,16 @@ int SimpleMap<T, U>::size() {
 template<typename T, typename U>
 void SimpleMap<T, U>::put(T key, U obj) {
     // create new node
-    Node<T, U>* newNode = new Node<T, U>();
+    SimpleMapNode<T, U>* newNode = new SimpleMapNode<T, U>();
     newNode->next = NULL;
     newNode->data = obj;
     newNode->key  = key;
 
     // look if already in list
-    Node<T, U>* h = listBegin;
-    Node<T, U>* p = NULL;
-    bool found    = false;
-    int  c        = 0;
+    SimpleMapNode<T, U>* h = listBegin;
+    SimpleMapNode<T, U>* p = NULL;
+    bool found             = false;
+    int  c                 = 0;
 
     if (listSize > 0) {
         while (h != NULL && !found) {
@@ -255,9 +255,9 @@ void SimpleMap<T, U>::remove(T key) {
     if (listSize > 0) {
         if ((compare(key, listBegin->key) < 0) || (compare(key, listEnd->key) > 0)) return;
 
-        Node<T, U>* h = listBegin;
-        Node<T, U>* p = NULL;
-        bool found    = false;
+        SimpleMapNode<T, U>* h = listBegin;
+        SimpleMapNode<T, U>* p = NULL;
+        bool found             = false;
 
         while (h != NULL && !found) {
             if (h->key == key) {
@@ -282,10 +282,10 @@ void SimpleMap<T, U>::remove(T key) {
 template<typename T, typename U>
 void SimpleMap<T, U>::remove(int i) {
     if (listSize > 0) {
-        Node<T, U>* h = getNodeIndex(i);
+        SimpleMapNode<T, U>* h = getNodeIndex(i);
 
         if (h != NULL) {
-            Node<T, U>* p = getNodeIndex(i);
+            SimpleMapNode<T, U>* p = getNodeIndex(i);
 
             if (p != NULL) p->next = h->next;
 
@@ -306,13 +306,13 @@ bool SimpleMap<T, U>::has(T key) {
 
 template<typename T, typename U>
 T SimpleMap<T, U>::getKey(int i) {
-    Node<T, U>* h = getNodeIndex(i);
+    SimpleMapNode<T, U>* h = getNodeIndex(i);
     return h ? h->key : T();
 }
 
 template<typename T, typename U>
 U SimpleMap<T, U>::getData(int i) {
-    Node<T, U>* h = getNodeIndex(i);
+    SimpleMapNode<T, U>* h = getNodeIndex(i);
     return h ? h->data : U();
 }
 
