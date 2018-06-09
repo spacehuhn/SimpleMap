@@ -26,13 +26,11 @@ file and paste it in your Arduino sketch folder.
 ```c++
 // A map of strings
 // Please not that it's necessary to provide a compare function, because it's needed to keep the map sorted!  
-SimpleMap<String, String> *myMap = new SimpleMap<String, String>([](String a, String b) -> int {
-        if (a == b) return 0;      // a and b are equal
-
-        else if (a > b) return 1;  // a is bigger than b
-
-        else return -1;            // a is smaller than b
-    });
+SimpleMap<String, String> *myMap = new SimpleMap<String, String>([](String &a, String &b) -> int {
+	if (a == b) return 0;      // a and b are equal
+	else if (a > b) return 1;  // a is bigger than b
+	else return -1;            // a is smaller than b
+});
 ```
 
 ### Getting the map size
