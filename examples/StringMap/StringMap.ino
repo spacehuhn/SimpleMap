@@ -82,6 +82,18 @@ void setup() {
     Serial.println(toJSON());
     myMap->remove(1); // delete element at index 1 (1 = index of elemt with key "two")
     Serial.println(toJSON());
+
+    // lock map
+    myMap->lock();
+    myMap->put("four", "4");
+    Serial.println(toJSON());
+    Serial.println("Locked: " + (String)myMap->isLocked());
+
+    // unlock map
+    myMap->unlock();
+    myMap->put("four", "4");
+    Serial.println(toJSON());
+    Serial.println("Locked: " + (String)myMap->isLocked());
 }
 
 void loop() {

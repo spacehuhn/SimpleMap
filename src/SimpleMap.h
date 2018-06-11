@@ -30,10 +30,16 @@ class SimpleMap {
         virtual int getIndex(T key);
         virtual bool has(T key);
 
+        virtual void lock();
+        virtual void unlock();
+        virtual bool isLocked();
+
     protected:
         int listSize;
         SimpleMapNode<T, U>* listBegin;
         SimpleMapNode<T, U>* listEnd;
+
+        bool locked = false;
 
         // Helps get() method by saving last position
         SimpleMapNode<T, U>* lastNodeGot = NULL;
@@ -175,7 +181,7 @@ void SimpleMap<T, U>::put(T key, U obj) {
 
     if (listSize > 0) {
         while (h != NULL && !found) {
-            if (h->key == key) {
+            if (compare(h->key, key) == 0) {
                 found = true;
             } else {
                 p = h;
@@ -196,10 +202,12 @@ void SimpleMap<T, U>::put(T key, U obj) {
         delete h;
 
         lastIndexGot = c;
+        lastNodeGot  = newNode;
+        isCached     = true;
     }
 
     // create new node
-    else {
+    else if (!locked) {
         if (listSize == 0) {
             // add at start (first node)
             listBegin = newNode;
@@ -207,13 +215,13 @@ void SimpleMap<T, U>::put(T key, U obj) {
 
             lastIndexGot = 0;
         } else {
-            if (key >= listEnd->key) {
+            if (compare(key, listEnd->key) >= 0) {
                 // add at end
                 listEnd->next = newNode;
                 listEnd       = newNode;
 
                 lastIndexGot = listSize;
-            } else if (key <= listBegin->key) {
+            } else if (compare(key, listBegin->key) <= 0) {
                 // add at start
                 newNode->next = listBegin;
                 listBegin     = newNode;
@@ -244,15 +252,15 @@ void SimpleMap<T, U>::put(T key, U obj) {
         }
 
         listSize++;
-    }
 
-    isCached    = true;
-    lastNodeGot = newNode;
+        isCached    = true;
+        lastNodeGot = newNode;
+    }
 }
 
 template<typename T, typename U>
 void SimpleMap<T, U>::remove(T key) {
-    if (listSize > 0) {
+    if ((listSize > 0) && !locked) {
         if ((compare(key, listBegin->key) < 0) || (compare(key, listEnd->key) > 0)) return;
 
         SimpleMapNode<T, U>* h = listBegin;
@@ -285,7 +293,7 @@ void SimpleMap<T, U>::remove(int i) {
         SimpleMapNode<T, U>* h = getNodeIndex(i);
 
         if (h != NULL) {
-            SimpleMapNode<T, U>* p = getNodeIndex(i);
+            SimpleMapNode<T, U>* p = getNodeIndex(i - 1);
 
             if (p != NULL) p->next = h->next;
 
@@ -319,6 +327,21 @@ U SimpleMap<T, U>::getData(int i) {
 template<typename T, typename U>
 int SimpleMap<T, U>::getIndex(T key) {
     return getNode(key) ? lastIndexGot : -1;
+}
+
+template<typename T, typename U>
+void SimpleMap<T, U>::lock() {
+    locked = true;
+}
+
+template<typename T, typename U>
+void SimpleMap<T, U>::unlock() {
+    locked = false;
+}
+
+template<typename T, typename U>
+bool SimpleMap<T, U>::isLocked() {
+    return locked;
 }
 
 #endif // ifndef SimpleMap_h
