@@ -142,6 +142,8 @@ SimpleMapNode<T, U>* SimpleMap<T, U>::getNodeIndex(int index) {
 
 template<typename T, typename U>
 void SimpleMap<T, U>::clear() {
+    unlock();
+
     SimpleMapNode<T, U>* h = listBegin;
     SimpleMapNode<T, U>* toDelete;
 
