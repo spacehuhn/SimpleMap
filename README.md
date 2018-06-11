@@ -79,7 +79,7 @@ myMap->remove("one");
 myMap->remove(0);
 
 // clear() will erase the entire map, leaving it with 0 elements
-myList->clear();
+myMap->clear();
 
 // Please note that clear() wont free memory from pointers, you have to manually delete/free those!
 // Example:
@@ -87,4 +87,16 @@ while(myMap->size() > 0){
 	delete myMap->get(0).somePointer;
 	myMap->remove(0);
 }
+```
+
+### Locking the map
+```
+// disables to remove() and put() fore new elements (changing values is allowed!)
+myMap->lock();
+
+// allow put() and remove() again
+myMap->unlock();
+
+// ask if map is locked
+bool isLocked = myMap->isLocked();
 ```
