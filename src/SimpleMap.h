@@ -78,6 +78,10 @@ SimpleMapNode<T, U>* SimpleMap<T, U>::getNode(T key) {
     if (listSize > 0) {
         if ((compare(key, listBegin->key) < 0) || (compare(key, listEnd->key) > 0)) return NULL;
 
+        if (isCached) {
+            if (compare(key, lastNodeGot->key) == 0) return lastNodeGot;
+        }
+
         SimpleMapNode<T, U>* h = listBegin;
 
         int lowerEnd = 0;
