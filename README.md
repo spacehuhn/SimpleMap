@@ -90,7 +90,7 @@ while(myMap->size() > 0){
 ```
 
 ### Locking the map
-```
+```c++
 // disables to remove() and put() fore new elements (changing values is allowed!)
 myMap->lock();
 
