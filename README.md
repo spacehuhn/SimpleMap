@@ -94,6 +94,8 @@ while(myMap->size() > 0){
 // disables to remove() and put() fore new elements (changing values is allowed!)
 myMap->lock();
 
+// Please note that clear() will unlock the map again! A locked map does not protect against clear()
+
 // allow put() and remove() again
 myMap->unlock();
 
