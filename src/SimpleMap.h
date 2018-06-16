@@ -17,7 +17,7 @@ class SimpleMap {
         int (*compare)(T & a, T & b);
 
         SimpleMap(int (*compare)(T & a, T & b));
-        ~SimpleMap();
+        virtual ~SimpleMap();
 
         virtual int size();
         virtual void clear();
